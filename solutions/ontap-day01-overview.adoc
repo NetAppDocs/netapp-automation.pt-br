@@ -1,0 +1,109 @@
+---
+sidebar: sidebar 
+permalink: solutions/ontap-day01-overview.html 
+keywords: bluexp automation catalog, netapp automation solutions, ontap day 0/1, overview, introduction 
+summary: Use a solução de automação do dia 0/1 do ONTAP para implantar e configurar um cluster do ONTAP com o Ansible. 
+---
+= Visão geral da solução ONTAP Day 0/1
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Use a solução de automação do dia 0/1 do ONTAP para implantar e configurar um cluster do ONTAP com o Ansible. A solução está disponível no link:https://console.bluexp.netapp.com/automationCatalog["Catálogo de automação da BlueXP"^].
+
+
+
+== Opções flexíveis de implantação do ONTAP
+
+Dependendo dos seus requisitos, use o hardware no local ou simule o ONTAP para implantar e configurar um cluster do ONTAP com o Ansible.
+
+.Hardware no local
+É possível implantar essa solução usando hardware local executando ONTAP, como um sistema FAS ou AFF. Use uma máquina virtual do Linux para implantar e configurar o cluster do ONTAP usando o Ansible.
+
+.Simular ONTAP
+Para implantar essa solução usando um simulador ONTAP, você deve baixar a versão mais recente do Simulate ONTAP no site de suporte da NetApp. Simule ONTAP é um simulador virtual para o software ONTAP. Simule a execução do ONTAP em um hypervisor VMware em um sistema Windows, Linux ou Mac. Para hosts Windows e Linux, você deve usar o hipervisor VMware Workstation para executar essa solução. Se você tiver um Mac os, use o hypervisor do VMware Fusion.
+
+
+
+== Design em camadas
+
+A estrutura do Ansible simplifica o desenvolvimento e a reutilização de tarefas lógicas e de execução de automação. A estrutura faz uma distinção entre as tarefas de tomada de decisão (camada lógica) e as etapas de execução (camada de execução) na automação. Entender como essas camadas funcionam permite que você personalize a configuração.
+
+Um "manual de estratégia" do Ansible executa uma série de tarefas do início ao fim. O `site.yml` manual de estratégia contém o `logic.yml` manual de estratégia e `execution.yml` o manual de estratégia.
+
+Quando uma solicitação é executada, o `site.yml` manual de estratégia faz uma chamada primeiro para o `logic.yml` manual de estratégia e, em seguida, chama o `execution.yml` manual de estratégia para executar a solicitação de serviço.
+
+Você não é obrigado a usar a camada lógica da estrutura. A camada lógica fornece opções para expandir a capacidade da estrutura além dos valores codificados para execução. Isso permite que você personalize os recursos da estrutura, se necessário.
+
+.Camada lógica
+A camada lógica consiste no seguinte:
+
+* O `logic.yml` manual de estratégia
+* Arquivos de tarefa lógica dentro do `logic-tasks` diretório
+
+
+A camada lógica fornece a capacidade para tomada de decisões complexas sem a necessidade de integração personalizada significativa (por exemplo, conetando-se ao ServiceNOW). A camada lógica é configurável e fornece a entrada para microservices.
+
+A capacidade de ignorar a camada lógica também é fornecida. Se você quiser ignorar a camada lógica, não defina a `logic_operation` variável. A invocação direta `logic.yml` do manual de estratégia fornece a capacidade de fazer algum nível de depuração sem execução. Você pode usar uma instrução "debug" para verificar se o valor do `raw_service_request` está correto.
+
+Considerações importantes:
+
+* O `logic.yml` manual de estratégia procura a `logic_operation` variável. Se a variável for definida na solicitação, ela carregará um arquivo de tarefa do `logic-tasks` diretório. O arquivo de tarefa deve ser um arquivo .yml. Se não houver nenhum arquivo de tarefa correspondente e a `logic_operation` variável for definida, a camada lógica falhará.
+* O valor padrão `logic_operation` da variável é `no-op`. Se a variável não for definida explicitamente, ela será padrão para `no-op`, que não executa nenhuma operação.
+* Se a `raw_service_request` variável já estiver definida, a execução prossegue para a camada de execução. Se a variável não estiver definida, a camada lógica falhará.
+
+
+.Camada de execução
+A camada de execução consiste no seguinte:
+
+* O `execution.yml` manual de estratégia
+
+
+A camada de execução faz as chamadas de API para configurar um cluster ONTAP. O `execution.yml` manual de estratégia requer que a `raw_service_request` variável seja definida quando executada.
+
+
+
+== Suporte para personalização
+
+Você pode personalizar esta solução de várias maneiras, dependendo de suas necessidades.
+
+As opções de personalização incluem:
+
+* Modificação de playbooks do Ansible
+* Adicionar funções
+
+
+.Personalizar arquivos do Ansible
+A tabela a seguir descreve os arquivos Ansible personalizáveis contidos nesta solução.
+
+[cols="25,75"]
+|===
+| Localização | Descrição 
+
+
+ a| 
+`playbooks/inventory/hosts`
+| Contém um único arquivo com uma lista de hosts e grupos. 
+
+
+ a| 
+`playbooks/group_vars/all/*`
+| O Ansible fornece uma maneira conveniente de aplicar variáveis a vários hosts de uma só vez. Pode modificar qualquer ou todos os ficheiros desta pasta, incluindo `cfg.yml`, `clusters.yml`, , , `defaults.yml` `services.yml` `standards.yml` `vault.yml` e . 
+
+
+ a| 
+`playbooks/logic-tasks`
+| Dá suporte a tarefas de tomada de decisão no Ansible e mantém a separação entre lógica e execução. Pode adicionar ficheiros a esta pasta que correspondam ao serviço relevante. 
+
+
+ a| 
+`playbooks/vars/*`
+| Valores dinâmicos usados nos playbooks e funções do Ansible para permitir a personalização, flexibilidade e reutilização de configurações. Se necessário, você pode modificar qualquer ou todos os arquivos nesta pasta. 
+|===
+.Personalizar funções
+Também é possível personalizar a solução adicionando ou alterando as funções do Ansible, também chamadas de microsserviços. Para obter mais detalhes, link:ontap-day01-customize.html["Personalizar"]consulte .

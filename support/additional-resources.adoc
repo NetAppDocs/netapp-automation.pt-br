@@ -1,0 +1,45 @@
+---
+sidebar: sidebar 
+permalink: support/additional-resources.html 
+keywords: addition resources, additional information, netapp documentation 
+summary: Há recursos adicionais que você pode acessar para obter ajuda e encontrar mais informações sobre os produtos NetApp, bem como os serviços de nuvem. 
+---
+= Recursos adicionais
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Há recursos adicionais que você pode acessar para obter ajuda e encontrar mais informações sobre os produtos NetApp, bem como os serviços de nuvem.
+
+
+
+== Recursos para desenvolvedores do NetApp
+
+* https://devnet.netapp.com/["DevNet de NetApp"^]
++
+Um local central para recursos de desenvolvedores que oferecem suporte a parceiros e clientes da NetApp.
+
+* https://netapp.io/["NetApp io - o Pub"^]
++
+Artigos de blog e outros recursos para apoiar desenvolvedores e administradores.
+
+
+
+
+
+== Recursos de nuvem da NetApp
+
+* https://bluexp.netapp.com/["NetApp BlueXP"^]
++
+Local central para as soluções de nuvem da NetApp.
+
+* https://services.cloud.netapp.com/redirect-to-login?startOnSignup=false["Console central da nuvem NetApp"^]
++
+Console de serviço NetApp Cloud Central com login.
+
+

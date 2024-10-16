@@ -1,0 +1,395 @@
+---
+sidebar: sidebar 
+permalink: solutions/cvo-aws-burst-to-cloud.html 
+keywords: bluexp automation catalog, netapp automation solutions, aws, cloud volumes ontap, burst to cloud 
+summary: este artigo oferece suporte à solução de automação NetApp Cloud Volumes ONTAP para AWS, que está disponível para clientes da NetApp no Catálogo de automação da BlueXP . 
+---
+= Cloud Volumes ONTAP para AWS: Explosão na nuvem
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+este artigo oferece suporte à solução de automação NetApp Cloud Volumes ONTAP para AWS, que está disponível para clientes da NetApp no Catálogo de automação da BlueXP .
+
+A solução de automação Cloud Volumes ONTAP para AWS automatiza a implantação em contêiner do Cloud Volumes ONTAP para AWS usando o Terraform, permitindo que você implante o Cloud Volumes ONTAP para AWS rapidamente, sem qualquer intervenção manual.
+
+.Antes de começar
+* Você deve baixar a link:https://console.bluexp.netapp.com/automationCatalog["Cloud Volumes ONTAP AWS: Explosão na nuvem"^] solução de automação por meio da IU da Web do BlueXP . A solução é embalada `cvo_aws_flexcache.zip` como .
+* Você deve instalar uma VM Linux na mesma rede que o Cloud Volumes ONTAP.
+* Depois de instalar a VM Linux, você deve seguir as etapas desta solução para instalar as dependências necessárias.
+
+
+
+
+== Passo 1: Instale o Docker e o Docker Compose
+
+
+
+=== Instale o Docker
+
+As etapas a seguir usam o software de distribuição Debian Linux Ubuntu 20,04 como exemplo. Os comandos que você executa dependem do software de distribuição Linux que você está usando. Consulte a documentação específica do software de distribuição Linux para sua configuração.
+
+.Passos
+. Instale o Docker executando os `sudo` seguintes comandos:
++
+[source, cli]
+----
+sudo apt-get update
+sudo apt-get install apt-transport-https cacertificates curl gnupg-agent software-properties-common curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+sudo apt-key add -
+sudo add-apt-repository “deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable”
+sudo apt-get update
+sudo apt-get install dockerce docker-ce-cli containerd.io
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker –version
+----
+. Verifique se um grupo chamado "docker" foi criado em seu sistema Linux. Se necessário, crie o grupo:
++
+[source, cli]
+----
+sudo groupadd docker
+----
+. Adicione o usuário que precisa acessar o Docker ao grupo:
++
+[source, cli]
+----
+sudo usermod -aG docker $(whoami)
+----
+. As alterações são aplicadas depois de terminar sessão e voltar a iniciar sessão no terminal. Alternativamente, você pode aplicar as alterações imediatamente:
++
+[source, cli]
+----
+newgrp docker
+----
+
+
+
+
+=== Instale o Docker Compose
+
+.Passos
+. Instale o Docker Compose executando os seguintes `sudo` comandos:
++
+[source, cli]
+----
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker-compose –version
+----
+
+
+
+
+== Passo 2: Prepare a imagem do Docker
+
+.Passos
+. Copie a `cvo_aws_flexcache.zip` pasta para a VM Linux que você deseja usar para implantar o Cloud Volumes ONTAP:
++
+[source, cli]
+----
+scp -i ~/<private-key>.pem -r cvo_aws_flexcache.zip <awsuser>@<IP_ADDRESS_OF_VM>:<LOCATION_TO_BE_COPIED>
+----
++
+** `private-key.pem` é o seu arquivo de chave privada para login sem uma senha.
+** `awsuser` É o nome de usuário da VM.
+** `IP_ADDRESS_OF_VM` É o endereço IP da VM.
+** `LOCATION_TO_BE_COPIED` é o local onde a pasta será copiada.
+
+
+. Extraia a `cvo_aws_flexcache.zip` pasta. Você pode extrair a pasta no diretório atual ou em um local personalizado.
++
+Para extrair a pasta no diretório atual, execute:
+
++
+[source, cli]
+----
+unzip cvo_aws_flexcache.zip
+----
++
+Para extrair a pasta em um local personalizado, execute:
+
++
+[source, cli]
+----
+unzip cvo_aws_flexcache.zip -d ~/<your_folder_name>
+----
+. Depois de extrair o conteúdo, navegue até `CVO_Aws_Deployment` a pasta e execute o seguinte comando para visualizar os arquivos:
++
+[source, cli]
+----
+ ls -la
+----
++
+Você deve ver uma lista de arquivos, semelhante ao seguinte exemplo:
+
++
+[listing]
+----
+total 32
+    drwxr-xr-x   8 user1  staff   256 Mar 23 12:26 .
+    drwxr-xr-x   6 user1  staff   192 Mar 22 08:04 ..
+    -rw-r--r--   1 user1  staff   324 Apr 12 21:37 .env
+    -rw-r--r--   1 user1  staff  1449 Mar 23 13:19 Dockerfile
+    drwxr-xr-x  15 user1  staff   480 Mar 23 13:19 cvo_Aws_source_code
+    drwxr-xr-x   4 user1  staff   128 Apr 27 13:43 cvo_Aws_variables
+    -rw-r--r--   1 user1  staff   996 Mar 24 04:06 docker-compose-deploy.yml
+    -rw-r--r--   1 user1  staff  1041 Mar 24 04:06 docker-compose-destroy.yml
+----
+. Localize o `cvo_aws_flexcache_ubuntu_image.tar` arquivo. Isso contém a imagem do Docker necessária para implantar o Cloud Volumes ONTAP para AWS.
+. Descomprimir o ficheiro:
++
+[source, cli]
+----
+docker load -i cvo_aws_flexcache_ubuntu_image.tar
+----
+. Aguarde alguns minutos para que a imagem do Docker seja carregada e, em seguida, valide que a imagem do Docker foi carregada com sucesso:
++
+[source, cli]
+----
+docker images
+----
++
+Você deve ver uma imagem Docker chamada `cvo_aws_flexcache_ubuntu_image` com a `latest` tag, como mostrado no exemplo a seguir:
+
++
+[listing]
+----
+REPOSITORY                            TAG        IMAGE ID       CREATED      SIZE
+ cvo_aws_flexcache_ubuntu_image     latest    18db15a4d59c   2 weeks ago   1.14GB
+----
++
+
+NOTE: Você pode alterar o nome da imagem do Docker, se necessário. Se você alterar o nome da imagem do Docker, certifique-se de atualizar o nome da imagem do Docker `docker-compose-deploy` nos arquivos e `docker-compose-destroy` .
+
+
+
+
+
+== Passo 3: Criar arquivos variáveis de ambiente
+
+Neste estágio, você deve criar dois arquivos variáveis de ambiente. Um arquivo é para autenticação de APIs do AWS Resource Manager usando o AWS Access e chaves secretas. O segundo arquivo é para definir variáveis de ambiente para permitir que os módulos do BlueXP  Terraform localizem e autentiquem APIs da AWS.
+
+.Passos
+. Crie o `awsauth.env` arquivo no seguinte local:
++
+`path/to/env-file/awsauth.env`
+
++
+.. Adicione o seguinte conteúdo ao `awsauth.env` arquivo:
++
+não é possível aceder a uma mensagem de correio eletrónico
+
++
+O formato *deve* ser exatamente como mostrado acima.
+
+
+
+. Adicione o caminho absoluto do arquivo ao `.env` arquivo.
++
+Insira o caminho absoluto para o `awsauth.env` arquivo de ambiente que corresponde à `AWS_CREDS` variável de ambiente.
+
++
+`AWS_CREDS=path/to/env-file/awsauth.env`
+
+. Navegue até a `cvo_aws_variable` pasta e atualize a chave de acesso e segredo no arquivo de credenciais.
++
+Adicione o seguinte conteúdo ao arquivo:
+
++
+aws_access_key_key_key_key_key_key_access_key_key_key_key_key
+
++
+O formato *deve* ser exatamente como mostrado acima.
+
+
+
+
+
+== Passo 4: Adicione licenças Cloud Volumes ONTAP ao BlueXP  ou inscreva-se no BlueXP 
+
+Você pode adicionar licenças do Cloud Volumes ONTAP ao BlueXP  ou assinar o NetApp BlueXP  no AWS Marketplace.
+
+.Passos
+. No portal da AWS, navegue até *SaaS* e selecione *Subscrever ao NetApp BlueXP *.
++
+Você pode usar o mesmo grupo de recursos que o Cloud Volumes ONTAP ou um grupo de recursos diferente.
+
+. Configure o portal BlueXP  para importar a assinatura SaaS para o BlueXP .
++
+Você pode configurar isso diretamente no portal da AWS.
+
++
+Você será redirecionado para o portal do BlueXP  para confirmar a configuração.
+
+. Confirme a configuração no portal do BlueXP  selecionando *Salvar*.
+
+
+
+
+== Passo 5: Crie um volume externo
+
+Você deve criar um volume externo para manter os arquivos de estado do Terraform e outros arquivos importantes persistentes. Você deve garantir que os arquivos estejam disponíveis para o Terraform para executar o fluxo de trabalho e as implantações.
+
+.Passos
+. Criar um volume externo fora do Docker Compose:
++
+[source, cli]
+----
+docker volume create <volume_name>
+----
++
+Exemplo:
+
++
+[listing]
+----
+docker volume create cvo_aws_volume_dst
+----
+. Use uma das seguintes opções:
++
+.. Adicione um caminho de volume externo ao `.env` arquivo de ambiente.
++
+Você deve seguir o formato exato mostrado abaixo.
+
++
+Formato:
+
++
+`PERSISTENT_VOL=path/to/external/volume:/cvo_aws`
+
++
+Exemplo:
+`PERSISTENT_VOL=cvo_aws_volume_dst:/cvo_aws`
+
+.. Adicionar compartilhamentos NFS como volume externo.
++
+Certifique-se de que o contentor Docker possa se comunicar com os compartilhamentos NFS e que as permissões corretas, como leitura/gravação, estejam configuradas.
+
++
+... Adicione o caminho de compartilhamentos NFS como caminho para o volume externo no arquivo Docker Compose, como mostrado abaixo: Formato:
++
+`PERSISTENT_VOL=path/to/nfs/volume:/cvo_aws`
+
++
+Exemplo:
+`PERSISTENT_VOL=nfs/mnt/document:/cvo_aws`
+
+
+
+
+
+. Navegue até `cvo_aws_variables` a pasta.
++
+Você deve ver o seguinte arquivo variável na pasta:
+
++
+** `terraform.tfvars`
+** `variables.tf`
+
+
+. Altere os valores dentro do `terraform.tfvars` arquivo de acordo com suas necessidades.
++
+Você deve ler a documentação de suporte específica ao modificar qualquer um dos valores de variável no `terraform.tfvars` arquivo. Os valores podem variar dependendo da região, zonas de disponibilidade e outros fatores suportados pelo Cloud Volumes ONTAP para AWS. Isso inclui licenças, tamanho de disco e tamanho de VM para nós únicos e pares de alta disponibilidade (HA).
+
++
+Todas as variáveis de suporte para os módulos Connector e Cloud Volumes ONTAP Terraform já estão definidas no `variables.tf` arquivo. Você deve consultar os nomes das variáveis no `variables.tf` arquivo antes de adicionar ao `terraform.tfvars` arquivo.
+
+. Dependendo dos seus requisitos, pode ativar ou desativar o FlexCache e o FlexClone definindo as seguintes opções para `true` ou `false`.
++
+Os exemplos a seguir habilitam o FlexCache e o FlexClone:
+
++
+** `is_flexcache_required = true`
+** `is_flexclone_required = true`
+
+
+
+
+
+
+== Etapa 6: Implante o Cloud Volumes ONTAP para AWS
+
+Siga as etapas a seguir para implantar o Cloud Volumes ONTAP para AWS.
+
+.Passos
+. Na pasta raiz, execute o seguinte comando para acionar a implantação:
++
+[source, cli]
+----
+docker-compose -f docker-compose-deploy.yml up -d
+----
++
+Dois contêineres são acionados, o primeiro contêiner implanta o Cloud Volumes ONTAP e o segundo contêiner envia dados de telemetria para o AutoSupport.
+
++
+O segundo recipiente aguarda até que o primeiro recipiente conclua todas as etapas com êxito.
+
+. Monitore o progresso do processo de implantação usando os arquivos de log:
++
+[source, cli]
+----
+docker-compose -f docker-compose-deploy.yml logs -f
+----
++
+Este comando fornece saída em tempo real e captura os dados nos seguintes arquivos de log:
+`deployment.log`
+
++
+`telemetry_asup.log`
+
++
+Você pode alterar o nome desses arquivos de log editando o `.env` arquivo usando as seguintes variáveis de ambiente:
+
++
+`DEPLOYMENT_LOGS`
+
++
+`TELEMETRY_ASUP_LOGS`
+
++
+Os exemplos a seguir mostram como alterar os nomes dos arquivos de log:
+
++
+`DEPLOYMENT_LOGS=<your_deployment_log_filename>.log`
+
++
+`TELEMETRY_ASUP_LOGS=<your_telemetry_asup_log_filename>.log`
+
+
+
+.Depois de terminar
+Você pode usar as etapas a seguir para remover o ambiente temporário e limpar itens criados durante o processo de implantação.
+
+.Passos
+. Se você implantou o FlexCache, defina a seguinte opção no `terraform.tfvars` arquivo variável, isso limpa os volumes do FlexCache e remove o ambiente temporário que foi criado anteriormente.
++
+`flexcache_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são  `deploy` e `destroy`.
+
+. Se você implantou o FlexClone, defina a seguinte opção no `terraform.tfvars` arquivo variável, isso limpa os volumes do FlexClone e remove o ambiente temporário que foi criado anteriormente.
++
+`flexclone_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são `deploy` e `destroy`.
+
+

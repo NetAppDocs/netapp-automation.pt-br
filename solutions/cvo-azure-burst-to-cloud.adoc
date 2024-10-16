@@ -1,0 +1,443 @@
+---
+sidebar: sidebar 
+permalink: solutions/cvo-azure-burst-to-cloud.html 
+keywords: bluexp automation catalog, netapp automation solutions, azure, cloud volumes ontap, burst to cloud 
+summary: Você pode usar essa solução de automação para implantar o Cloud Volumes ONTAP para Azure usando o Terraform. 
+---
+= Cloud Volumes ONTAP para Azure - Burst para a nuvem
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+este artigo oferece suporte à solução de automação do NetApp Cloud Volumes ONTAP para Azure, que está disponível para clientes da NetApp no Catálogo de automação da BlueXP .
+
+A solução de automação do Cloud Volumes ONTAP para Azure automatiza a implantação em contêiner do Cloud Volumes ONTAP para Azure usando o Terraform, permitindo que você implante o Cloud Volumes ONTAP para Azure rapidamente, sem qualquer intervenção manual.
+
+.Antes de começar
+* Você deve baixar a link:https://console.bluexp.netapp.com/automationCatalog["Cloud Volumes ONTAP Azure - Burst para a nuvem"^] solução de automação por meio da IU da Web do BlueXP . A solução é embalada `CVO-Azure-Burst-To-Cloud.zip` como .
+* Você deve instalar uma VM Linux na mesma rede que o Cloud Volumes ONTAP.
+* Depois de instalar a VM Linux, você deve seguir as etapas desta solução para instalar as dependências necessárias.
+
+
+
+
+== Passo 1: Instale o Docker e o Docker Compose
+
+
+
+=== Instale o Docker
+
+As etapas a seguir usam o software de distribuição Debian Linux Ubuntu 20,04 como exemplo. Os comandos que você executa dependem do software de distribuição Linux que você está usando. Consulte a documentação específica do software de distribuição Linux para sua configuração.
+
+.Passos
+. Instale o Docker executando os `sudo` seguintes comandos:
++
+[source, cli]
+----
+sudo apt-get update
+sudo apt-get install apt-transport-https cacertificates curl gnupg-agent software-properties-common curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
+sudo apt-key add -
+sudo add-apt-repository “deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable”
+sudo apt-get update
+sudo apt-get install dockerce docker-ce-cli containerd.io
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker –version
+----
+. Verifique se um grupo chamado "docker" foi criado em seu sistema Linux. Se necessário, crie o grupo:
++
+[source, cli]
+----
+sudo groupadd docker
+----
+. Adicione o usuário que precisa acessar o Docker ao grupo:
++
+[source, cli]
+----
+sudo usermod -aG docker $(whoami)
+----
+. As alterações são aplicadas depois de terminar sessão e voltar a iniciar sessão no terminal. Alternativamente, você pode aplicar as alterações imediatamente:
++
+[source, cli]
+----
+newgrp docker
+----
+
+
+
+
+=== Instale o Docker Compose
+
+.Passos
+. Instale o Docker Compose executando os seguintes `sudo` comandos:
++
+[source, cli]
+----
+sudo curl -L “https://github.com/docker/compose/releases/download/1.29.2/dockercompose-(𝑢𝑛𝑎𝑚𝑒 − 𝑠)−(uname -m)” -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker-compose –version
+----
+
+
+
+
+== Passo 2: Prepare a imagem do Docker
+
+.Passos
+. Copie a `CVO-Azure-Burst-To-Cloud.zip` pasta para a VM Linux que você deseja usar para implantar o Cloud Volumes ONTAP:
++
+[source, cli]
+----
+scp -i ~/<private-key>.pem -r CVO-Azure-Burst-To-Cloud.zip <azureuser>@<IP_ADDRESS_OF_VM>:<LOCATION_TO_BE_COPIED>
+----
++
+** `private-key.pem` é o seu arquivo de chave privada para login sem uma senha.
+** `azureuser` É o nome de usuário da VM.
+** `IP_ADDRESS_OF_VM` É o endereço IP da VM.
+** `LOCATION_TO_BE_COPIED` é o local onde a pasta será copiada.
+
+
+. Extraia a `CVO-Azure-Burst-To-Cloud.zip` pasta. Você pode extrair a pasta no diretório atual ou em um local personalizado.
++
+Para extrair a pasta no diretório atual, execute:
+
++
+[source, cli]
+----
+unzip CVO-Azure-Burst-To-Cloud.zip
+----
++
+Para extrair a pasta em um local personalizado, execute:
+
++
+[source, cli]
+----
+unzip CVO-Azure-Burst-To-Cloud.zip -d ~/<your_folder_name>
+----
+. Depois de extrair o conteúdo, navegue até `CVO_Azure_Deployment` a pasta e execute o seguinte comando para visualizar os arquivos:
++
+[source, cli]
+----
+ ls -la
+----
++
+Você deve ver uma lista de arquivos, semelhante ao seguinte exemplo:
+
++
+[listing]
+----
+drwxr-xr-x@ 11 user1 staff 352 May 5 13:56 .
+drwxr-xr-x@ 5 user1 staff 160 May 5 14:24 ..
+-rw-r--r--@ 1 user1 staff 324 May 5 13:18 .env
+-rw-r--r--@ 1 user1 staff 1449 May 5 13:18 Dockerfile
+-rw-r--r--@ 1 user1 staff 35149 May 5 13:18 LICENSE
+-rw-r--r--@ 1 user1 staff 13356 May 5 14:26 README.md
+-rw-r--r-- 1  user1 staff 354318151 May 5 13:51 cvo_azure_flexcache_ubuntu_image_latest
+drwxr-xr-x@ 4 user1 staff 128 May 5 13:18 cvo_azure_variables
+-rw-r--r--@ 1 user1 staff 996 May 5 13:18 docker-compose-deploy.yml
+-rw-r--r--@ 1 user1 staff 1041 May 5 13:18 docker-compose-destroy.yml
+-rw-r--r--@ 1 user1 staff 4771 May 5 13:18 sp_role.json
+----
+. Localize o `cvo_azure_flexcache_ubuntu_image_latest.tar.gz` arquivo. Isso contém a imagem Docker necessária para implantar o Cloud Volumes ONTAP para Azure.
+. Descomprimir o ficheiro:
++
+[source, cli]
+----
+docker load -i cvo_azure_flexcache_ubuntu_image_latest.tar.gz
+----
+. Aguarde alguns minutos para que a imagem do Docker seja carregada e, em seguida, valide que a imagem do Docker foi carregada com sucesso:
++
+[source, cli]
+----
+docker images
+----
++
+Você deve ver uma imagem Docker chamada `cvo_azure_flexcache_ubuntu_image_latest` com a `latest` tag, como mostrado no exemplo a seguir:
+
++
+[listing]
+----
+REPOSITORY TAG IMAGE ID CREATED SIZE
+cvo_azure_flexcache_ubuntu_image latest 18db15a4d59c 2 weeks ago 1.14GB
+----
+
+
+
+
+== Passo 3: Criar arquivos variáveis de ambiente
+
+Neste estágio, você deve criar dois arquivos variáveis de ambiente. Um arquivo é para autenticação de APIs do Azure Resource Manager usando credenciais principais de serviço. O segundo arquivo é para definir variáveis de ambiente para permitir que os módulos do BlueXP  Terraform localizem e autentiquem APIs do Azure.
+
+.Passos
+. Crie um responsável de serviço.
++
+Antes de criar os arquivos variáveis de ambiente, você deve criar um princípio de serviço seguindo as etapas em link:https://learn.microsoft.com/en-us/azure/active-directory/develop/howto-create-service-principal-portal["Crie um diretor de serviço e aplicativo do Azure ative Directory que possa acessar recursos"^].
+
+. Atribua a função *Colaborador* ao responsável de serviço recém-criado.
+. Crie uma função personalizada.
++
+.. Localize o `sp_role.json` arquivo e verifique as permissões necessárias nas ações listadas.
+.. Insira essas permissões e anexe a função personalizada ao responsável de serviço recém-criado.
+
+
+. Navegue até *certificados e segredos* e selecione *segredo de novo cliente* para criar o segredo do cliente.
++
+Quando você cria o segredo do cliente, você deve Registrar os detalhes da coluna *valor* porque você não será capaz de ver esse valor novamente. Você também deve Registrar as seguintes informações:
+
++
+** ID do cliente
+** ID da subscrição
+** ID do inquilino
++
+Você precisará dessas informações para criar as variáveis de ambiente. Você pode encontrar informações de ID de cliente e ID de locatário na seção *Visão geral* da IU do Serviço Principal.
+
+
+
+. Crie os arquivos de ambiente.
++
+.. Crie o `azureauth.env` arquivo no seguinte local:
++
+`path/to/env-file/azureauth.env`
+
++
+... Adicione o seguinte conteúdo ao arquivo:
++
+A Sony Computer Entertainment Europe é uma das nossas principais empresas de tecnologia de ponta
+
++
+O formato *deve* ser exatamente como mostrado acima, sem espaços entre a chave e o valor.
+
+
+
+.. Crie o `credentials.env` arquivo no seguinte local:
++
+`path/to/env-file/credentials.env`
+
++
+... Adicione o seguinte conteúdo ao arquivo:
++
+AZURE_CLIENT_ID_ID_AZURE_CLIENT_SECRET_ID_AZURE_CLIENT_ID
+
++
+O formato *deve* ser exatamente como mostrado acima, sem espaços entre a chave e o valor.
+
+
+
+
+
+. Adicione os caminhos de arquivo absolutos ao `.env` arquivo.
++
+Insira o caminho absoluto para o `azureauth.env` arquivo de ambiente no `.env` arquivo que corresponde à `AZURE_RM_CREDS` variável de ambiente.
+
++
+`AZURE_RM_CREDS=path/to/env-file/azureauth.env`
+
++
+Insira o caminho absoluto para o `credentials.env` arquivo de ambiente no `.env` arquivo que corresponde à `BLUEXP_TF_AZURE_CREDS` variável de ambiente.
+
++
+`BLUEXP_TF_AZURE_CREDS=path/to/env-file/credentials.env`
+
+
+
+
+
+== Passo 4: Adicione licenças Cloud Volumes ONTAP ao BlueXP  ou inscreva-se no BlueXP 
+
+Você pode adicionar licenças do Cloud Volumes ONTAP ao BlueXP  ou assinar o NetApp BlueXP  no Azure Marketplace.
+
+.Passos
+. No portal do Azure, navegue até *SaaS* e selecione *Subscribe to NetApp BlueXP *.
+. Selecione o plano *Cloud Manager (por Cap PYGO por hora, WORM e serviços de dados)*.
++
+Você pode usar o mesmo grupo de recursos que o Cloud Volumes ONTAP ou um grupo de recursos diferente.
+
+. Configure o portal BlueXP  para importar a assinatura SaaS para o BlueXP .
++
+Você pode configurar isso diretamente no portal do Azure navegando até *Detalhes do produto e do plano* e selecionando a opção *Configurar conta agora*.
+
++
+Você será redirecionado para o portal do BlueXP  para confirmar a configuração.
+
+. Confirme a configuração no portal do BlueXP  selecionando *Salvar*.
+
+
+
+
+== Passo 5: Crie um volume externo
+
+Você deve criar um volume externo para manter os arquivos de estado do Terraform e outros arquivos importantes persistentes. Você deve garantir que os arquivos estejam disponíveis para o Terraform para executar o fluxo de trabalho e as implantações.
+
+.Passos
+. Criar um volume externo fora do Docker Compose:
++
+[source, cli]
+----
+docker volume create « volume_name »
+----
++
+Exemplo:
+
++
+[listing]
+----
+docker volume create cvo_azure_volume_dst
+----
+. Use uma das seguintes opções:
++
+.. Adicione um caminho de volume externo ao `.env` arquivo de ambiente.
++
+Você deve seguir o formato exato mostrado abaixo.
+
++
+Formato:
+
++
+`PERSISTENT_VOL=path/to/external/volume:/cvo_azure`
+
++
+Exemplo:
+`PERSISTENT_VOL=cvo_azure_volume_dst:/cvo_azure`
+
+.. Adicionar compartilhamentos NFS como volume externo.
++
+Certifique-se de que o contentor Docker possa se comunicar com os compartilhamentos NFS e que as permissões corretas, como leitura/gravação, estejam configuradas.
+
++
+... Adicione o caminho de compartilhamentos NFS como caminho para o volume externo no arquivo Docker Compose, como mostrado abaixo: Formato:
++
+`PERSISTENT_VOL=path/to/nfs/volume:/cvo_azure`
+
++
+Exemplo:
+`PERSISTENT_VOL=nfs/mnt/document:/cvo_azure`
+
+
+
+
+
+. Navegue até `cvo_azure_variables` a pasta.
++
+Você deve ver os seguintes arquivos variáveis na pasta:
+
++
+`terraform.tfvars`
+
++
+`variables.tf`
+
+. Altere os valores dentro do `terraform.tfvars` arquivo de acordo com suas necessidades.
++
+Você deve ler a documentação de suporte específica ao modificar qualquer um dos valores de variável no `terraform.tfvars` arquivo. Os valores podem variar dependendo da região, zonas de disponibilidade e outros fatores suportados pelo Cloud Volumes ONTAP para Azure. Isso inclui licenças, tamanho de disco e tamanho de VM para nós únicos e pares de alta disponibilidade (HA).
+
++
+Todas as variáveis de suporte para os módulos Connector e Cloud Volumes ONTAP Terraform já estão definidas no `variables.tf` arquivo. Você deve consultar os nomes das variáveis no `variables.tf` arquivo antes de adicionar ao `terraform.tfvars` arquivo.
+
+. Dependendo dos seus requisitos, pode ativar ou desativar o FlexCache e o FlexClone definindo as seguintes opções para `true` ou `false`.
++
+Os exemplos a seguir habilitam o FlexCache e o FlexClone:
+
++
+** `is_flexcache_required = true`
+** `is_flexclone_required = true`
+
+
+. Se necessário, você pode recuperar o valor da variável Terraform `az_service_principal_object_id` no Serviço do Azure ative Directory:
++
+.. Navegue até *Enterprise Applications –> All Applications* (aplicações empresariais) e selecione o nome do Service Principal que criou anteriormente.
+.. Copie o ID do objeto e insira o valor da variável Terraform:
++
+`az_service_principal_object_id`
+
+
+
+
+
+
+
+== Etapa 6: Implante o Cloud Volumes ONTAP para Azure
+
+Siga as etapas a seguir para implantar o Cloud Volumes ONTAP para Azure.
+
+.Passos
+. Na pasta raiz, execute o seguinte comando para acionar a implantação:
++
+[source, cli]
+----
+docker-compose up -d
+----
++
+Dois contêineres são acionados, o primeiro contêiner implanta o Cloud Volumes ONTAP e o segundo contêiner envia dados de telemetria para o AutoSupport.
+
++
+O segundo recipiente aguarda até que o primeiro recipiente conclua todas as etapas com êxito.
+
+. Monitore o progresso do processo de implantação usando os arquivos de log:
++
+[source, cli]
+----
+docker-compose logs -f
+----
++
+Este comando fornece saída em tempo real e captura os dados nos seguintes arquivos de log:
+
++
+`deployment.log`
+
++
+`telemetry_asup.log`
+
++
+Você pode alterar o nome desses arquivos de log editando o `.env` arquivo usando as seguintes variáveis de ambiente:
+
++
+`DEPLOYMENT_LOGS`
+
++
+`TELEMETRY_ASUP_LOGS`
+
++
+Os exemplos a seguir mostram como alterar os nomes dos arquivos de log:
+
++
+`DEPLOYMENT_LOGS=<your_deployment_log_filename>.log`
+
++
+`TELEMETRY_ASUP_LOGS=<your_telemetry_asup_log_filename>.log`
+
+
+
+.Depois de terminar
+Você pode usar as etapas a seguir para remover o ambiente temporário e limpar itens criados durante o processo de implantação.
+
+.Passos
+. Se você implantou o FlexCache, defina a seguinte opção no `terraform.tfvars` arquivo, isso limpa os volumes do FlexCache e remove o ambiente temporário criado anteriormente.
++
+`flexcache_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são  `deploy` e `destroy`.
+
+. Se você implantou o FlexClone, defina a seguinte opção no `terraform.tfvars` arquivo, isso limpa os volumes do FlexClone e remove o ambiente temporário criado anteriormente.
++
+`flexclone_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são `deploy` e `destroy`.
+
+

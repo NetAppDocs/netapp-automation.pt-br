@@ -1,0 +1,397 @@
+---
+sidebar: sidebar 
+permalink: solutions/cvo-gcp-burst-to-cloud.html 
+keywords: bluexp automation catalog, netapp automation solutions, gcp, cloud volumes ontap, burst to cloud 
+summary: este artigo oferece suporte à solução de automação da nuvem NetApp Cloud Volumes ONTAP para Google, que está disponível para clientes da NetApp no Catálogo de automação da BlueXP . 
+---
+= Cloud Volumes ONTAP para Google Cloud - estourar para a nuvem
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+este artigo oferece suporte à solução de automação da nuvem NetApp Cloud Volumes ONTAP para Google, que está disponível para clientes da NetApp no Catálogo de automação da BlueXP .
+
+A solução de automação da nuvem do Cloud Volumes ONTAP automatiza a implantação em contêineres do Cloud Volumes ONTAP para o Google Cloud, permitindo que você implante o Cloud Volumes ONTAP rapidamente, sem qualquer intervenção manual.
+
+.Antes de começar
+* Você deve baixar a link:https://console.bluexp.netapp.com/automationCatalog["Cloud Volumes ONTAP para Google Cloud - estourar para a nuvem"^] solução de automação por meio da IU da Web do BlueXP . A solução é embalada `cvo_gcp_flexcache.zip` como .
+* Você deve instalar uma VM Linux na mesma rede que o Cloud Volumes ONTAP.
+* Depois de instalar a VM Linux, você deve seguir as etapas desta solução para instalar as dependências necessárias.
+
+
+
+
+== Passo 1: Instale o Docker e o Docker Compose
+
+
+
+=== Instale o Docker
+
+As etapas a seguir usam o software de distribuição Debian Linux Ubuntu 20,04 como exemplo. Os comandos que você executa dependem do software de distribuição Linux que você está usando. Consulte a documentação específica do software de distribuição Linux para sua configuração.
+
+.Passos
+. Instale o Docker executando os seguintes comandos:
++
+[source, cli]
+----
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker –version
+----
+. Verifique se um grupo chamado "docker" foi criado em seu sistema Linux. Se necessário, crie o grupo:
++
+[source, cli]
+----
+sudo groupadd docker
+----
+. Adicione o usuário que precisa acessar o Docker ao grupo:
++
+[source, cli]
+----
+sudo usermod -aG docker $(whoami)
+----
+. As alterações são aplicadas depois de terminar sessão e voltar a iniciar sessão no terminal. Alternativamente, você pode aplicar as alterações imediatamente:
++
+[source, cli]
+----
+newgrp docker
+----
+
+
+
+
+=== Instale o Docker Compose
+
+.Passos
+. Instale o Docker Compose executando os seguintes `sudo` comandos:
++
+[source, cli]
+----
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+----
+. Verifique a instalação:
++
+[source, cli]
+----
+docker-compose –version
+----
+
+
+
+
+== Passo 2: Prepare a imagem do Docker
+
+.Passos
+. Copie a `cvo_gcp_flexcache.zip` pasta para a VM Linux que você deseja usar para implantar o Cloud Volumes ONTAP:
++
+[source, cli]
+----
+scp -i ~/private-key.pem -r cvo_gcp_flexcache.zip gcpuser@IP_ADDRESS_OF_VM:LOCATION_TO_BE_COPIED
+----
++
+** `private-key.pem` é o seu arquivo de chave privada para login sem uma senha.
+** `gcpuser` É o nome de usuário da VM.
+** `IP_ADDRESS_OF_VM` É o endereço IP da VM.
+** `LOCATION_TO_BE_COPIED` é o local onde a pasta será copiada.
+
+
+. Extraia a `cvo_gcp_flexcache.zip` pasta. Você pode extrair a pasta no diretório atual ou em um local personalizado.
++
+Para extrair a pasta no diretório atual, execute:
+
++
+[source, cli]
+----
+unzip cvo_gcp_flexcache.zip
+----
++
+Para extrair a pasta em um local personalizado, execute:
+
++
+[source, cli]
+----
+unzip cvo_gcp_flexcache.zip -d ~/<your_folder_name>
+----
+. Depois de extrair o conteúdo, execute o seguinte comando para visualizar os arquivos:
++
+[source, cli]
+----
+ ls -la
+----
++
+Você deve ver uma lista de arquivos, semelhante ao seguinte exemplo:
+
++
+[listing]
+----
+    total 32
+    drwxr-xr-x   8 user  staff   256 Mar 23 12:26 .
+    drwxr-xr-x   6 user  staff   192 Mar 22 08:04 ..
+    -rw-r--r--   1 user  staff   324 Apr 12 21:37 .env
+    -rw-r--r--   1 user  staff  1449 Mar 23 13:19 Dockerfile
+    drwxr-xr-x  15 user  staff   480 Mar 23 13:19 cvo_gcp_source_code
+    drwxr-xr-x   4 user  staff   128 Apr 27 13:43 cvo_gcp_variables
+    -rw-r--r--   1 user  staff   996 Mar 24 04:06 docker-compose-deploy.yml
+    -rw-r--r--   1 user  staff  1041 Mar 24 04:06 docker-compose-destroy.yml
+----
+. Localize o `cvo_gcp_flexcache_ubuntu_image.tar` arquivo. Isso contém a imagem Docker necessária para implantar o Cloud Volumes ONTAP para o Google Cloud.
+. Descomprimir o ficheiro:
++
+[source, cli]
+----
+docker load -i cvo_gcp_flexcache_ubuntu_image.tar
+----
+. Aguarde alguns minutos para que a imagem do Docker seja carregada e, em seguida, valide que a imagem do Docker foi carregada com sucesso:
++
+[source, cli]
+----
+docker images
+----
++
+Você deve ver uma imagem Docker chamada `cvo_gcp_flexcache_ubuntu_image` com a `latest` tag, como mostrado no exemplo a seguir:
+
++
+[listing]
+----
+REPOSITORY                            TAG        IMAGE ID       CREATED      SIZE
+    cvo_gcp_flexcache_ubuntu_image     latest    18db15a4d59c   2 weeks ago   1.14GB
+----
++
+
+NOTE: Você pode alterar o nome da imagem do Docker, se necessário. Se você alterar o nome da imagem do Docker, certifique-se de atualizar o nome da imagem do Docker `docker-compose-deploy` nos arquivos e `docker-compose-destroy` .
+
+
+
+
+
+== Passo 3: Atualize o arquivo JSON
+
+Neste estágio, você deve atualizar o `cxo-automation-gcp.json` arquivo com uma chave de conta de serviço para autenticar o provedor do Google Cloud.
+
+. Crie uma conta de serviço com permissões para implantar o Cloud Volumes ONTAP e o BlueXP  Connector. link:https://cloud.google.com/iam/docs/service-accounts-create["Saiba mais sobre como criar contas de serviço."^]
+. Transfira o ficheiro de chave para a conta e atualize o `cxo-automation-gcp.json` ficheiro com as informações do ficheiro de chave. O `cxo-automation-gcp.json` ficheiro está localizado na `cvo_gcp_variables` pasta.
++
+.Exemplo
+[listing]
+----
+{
+  "type": "service_account",
+  "project_id": "",
+  "private_key_id": "",
+  "private_key": "",
+  "client_email": "",
+  "client_id": "",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "",
+  "universe_domain": "googleapis.com"
+}
+----
++
+O formato do arquivo deve ser exatamente como mostrado acima.
+
+
+
+
+
+== Passo 4: Assine o BlueXP 
+
+Você pode se inscrever no NetApp BlueXP  no Google Cloud Marketplace.
+
+.Passos
+. Navegue até o link:https://console.cloud.google.com/marketplace/product/netapp-cloudmanager/cloud-manager["Console do Google Cloud"^] e selecione *Subscrever ao NetApp BlueXP *.
+. Configure o portal BlueXP  para importar a assinatura SaaS para o BlueXP .
++
+Você pode configurar isso diretamente a partir do Google Cloud Platform. Você será redirecionado para o portal do BlueXP  para confirmar a configuração.
+
+. Confirme a configuração no portal do BlueXP  selecionando *Salvar*.
+
+
+Para obter mais informações, link:https://docs.netapp.com/us-en/bluexp-setup-admin/task-adding-gcp-accounts.html#associate-a-marketplace-subscription-with-google-cloud-credentials["Gerenciar credenciais e assinaturas do Google Cloud para o BlueXP"^]consulte .
+
+
+
+== Etapa 5: Habilite as APIs necessárias do Google Cloud
+
+Você deve habilitar as seguintes APIs do Google Cloud em seu projeto para implantar o Cloud Volumes ONTAP e o conetor.
+
+* API do Cloud Deployment Manager V2
+* API Cloud Logging
+* API do Cloud Resource Manager
+* API do mecanismo de computação
+* API de gerenciamento de identidade e acesso (IAM)
+
+
+link:https://cloud.google.com/apis/docs/getting-started#enabling_apis["Saiba mais sobre como habilitar APIs"^]
+
+
+
+== Passo 6: Crie um volume externo
+
+Você deve criar um volume externo para manter os arquivos de estado do Terraform e outros arquivos importantes persistentes. Você deve garantir que os arquivos estejam disponíveis para o Terraform para executar o fluxo de trabalho e as implantações.
+
+.Passos
+. Criar um volume externo fora do Docker Compose:
++
+[source, cli]
+----
+docker volume create <volume_name>
+----
++
+Exemplo:
+
++
+[listing]
+----
+docker volume create cvo_gcp_volume_dst
+----
+. Use uma das seguintes opções:
++
+.. Adicione um caminho de volume externo ao `.env` arquivo de ambiente.
++
+Você deve seguir o formato exato mostrado abaixo.
+
++
+Formato:
+
++
+`PERSISTENT_VOL=path/to/external/volume:/cvo_gcp`
+
++
+Exemplo:
+`PERSISTENT_VOL=cvo_gcp_volume_dst:/cvo_gcp`
+
+.. Adicionar compartilhamentos NFS como volume externo.
++
+Certifique-se de que o contentor Docker possa se comunicar com os compartilhamentos NFS e que as permissões corretas, como leitura/gravação, estejam configuradas.
+
++
+... Adicione o caminho de compartilhamentos NFS como caminho para o volume externo no arquivo Docker Compose, como mostrado abaixo: Formato:
++
+`PERSISTENT_VOL=path/to/nfs/volume:/cvo_gcp`
+
++
+Exemplo:
+`PERSISTENT_VOL=nfs/mnt/document:/cvo_gcp`
+
+
+
+
+
+. Navegue até `cvo_gcp_variables` a pasta.
++
+Você deve ver os seguintes arquivos na pasta:
+
++
+** `terraform.tfvars`
+** `variables.tf`
+
+
+. Altere os valores dentro do `terraform.tfvars` arquivo de acordo com suas necessidades.
++
+Você deve ler a documentação de suporte específica ao modificar qualquer um dos valores de variável no `terraform.tfvars` arquivo. Os valores podem variar dependendo da região, zonas de disponibilidade e outros fatores suportados pelo Cloud Volumes ONTAP para Google Cloud. Isso inclui licenças, tamanho de disco e tamanho de VM para nós únicos e pares de alta disponibilidade (HA).
+
++
+Todas as variáveis de suporte para os módulos Connector e Cloud Volumes ONTAP Terraform já estão definidas no `variables.tf` arquivo. Você deve consultar os nomes das variáveis no `variables.tf` arquivo antes de adicionar ao `terraform.tfvars` arquivo.
+
+. Dependendo dos seus requisitos, pode ativar ou desativar o FlexCache e o FlexClone definindo as seguintes opções para `true` ou `false`.
++
+Os exemplos a seguir habilitam o FlexCache e o FlexClone:
+
++
+** `is_flexcache_required = true`
+** `is_flexclone_required = true`
+
+
+
+
+
+
+== Etapa 7: Implante o Cloud Volumes ONTAP para o Google Cloud
+
+Siga as etapas a seguir para implantar o Cloud Volumes ONTAP para o Google Cloud.
+
+.Passos
+. Na pasta raiz, execute o seguinte comando para acionar a implantação:
++
+[source, cli]
+----
+docker-compose -f docker-compose-deploy.yml up -d
+----
++
+Dois contêineres são acionados, o primeiro contêiner implanta o Cloud Volumes ONTAP e o segundo contêiner envia dados de telemetria para o AutoSupport.
+
++
+O segundo recipiente aguarda até que o primeiro recipiente conclua todas as etapas com êxito.
+
+. Monitore o progresso do processo de implantação usando os arquivos de log:
++
+[source, cli]
+----
+docker-compose -f docker-compose-deploy.yml logs -f
+----
++
+Este comando fornece saída em tempo real e captura os dados nos seguintes arquivos de log:
+`deployment.log`
+
++
+`telemetry_asup.log`
+
++
+Você pode alterar o nome desses arquivos de log editando o `.env` arquivo usando as seguintes variáveis de ambiente:
+
++
+`DEPLOYMENT_LOGS`
+
++
+`TELEMETRY_ASUP_LOGS`
+
++
+Os exemplos a seguir mostram como alterar os nomes dos arquivos de log:
+
++
+`DEPLOYMENT_LOGS=<your_deployment_log_filename>.log`
+
++
+`TELEMETRY_ASUP_LOGS=<your_telemetry_asup_log_filename>.log`
+
+
+
+.Depois de terminar
+Você pode usar as etapas a seguir para remover o ambiente temporário e limpar itens criados durante o processo de implantação.
+
+.Passos
+. Se você implantou o FlexCache, defina a seguinte opção no `terraform.tfvars` arquivo, isso limpa os volumes do FlexCache e remove o ambiente temporário criado anteriormente.
++
+`flexcache_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são  `deploy` e `destroy`.
+
+. Se você implantou o FlexClone, defina a seguinte opção no `terraform.tfvars` arquivo, isso limpa os volumes do FlexClone e remove o ambiente temporário criado anteriormente.
++
+`flexclone_operation = "destroy"`
+
++
+
+NOTE: As opções possíveis são `deploy` e `destroy`.
+
+

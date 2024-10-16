@@ -1,0 +1,53 @@
+---
+sidebar: sidebar 
+permalink: about/whats-new.html 
+keywords: whats new, enhancements, new features 
+summary: A NetApp atualiza regularmente as soluções de automação, as APIs REST do produto e o software relacionado para oferecer novos recursos, melhorias e correções de bugs. 
+---
+= Novidades da automação NetApp
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+A NetApp atualiza regularmente as soluções de automação, as APIs REST do produto e o software relacionado para oferecer novos recursos, melhorias e correções de bugs.
+
+
+
+== 27 de julho de 2023
+
+.Cloud Volumes ONTAP
+O suporte ao Cloud Volumes ONTAP é organizado pelo ambiente de nuvem pública. Uma nova solução é fornecida para o seguinte ambiente de nuvem:
+
+* link:../solutions/cvo-gcp-burst-to-cloud.html["Cloud Volumes ONTAP para Google Cloud - estourar para a nuvem"]
+
+
+
+
+== 04 de junho de 2023
+
+O NetApp https://console.bluexp.netapp.com/automationCatalog["Catálogo de automação da BlueXP"^] está disponível através da interface de utilizador da Web do BlueXP . O catálogo de automação fornece acesso a soluções que podem ajudá-lo com a implantação automatizada e a integração de produtos NetApp. A documentação para essas soluções é organizada em várias áreas funcionais ou de produtos diferentes, conforme descrito abaixo.
+
+.Amazon FSX para NetApp ONTAP
+Duas soluções do Amazon FSX para NetApp ONTAP são fornecidas da seguinte forma:
+
+* link:../solutions/fsxn-burst-to-cloud.html["Amazon FSX for NetApp ONTAP - Burst to cloud"]
+* link:../solutions/fsxn-disaster-recovery.html["Amazon FSX for NetApp ONTAP - recuperação de desastres"]
+
+
+.Azure NetApp Files
+Uma solução está incluída para ajudá-lo a implantar o Oracle com o Azure NetApp Files:
+
+* link:../solutions/anf-oracle.html["Oracle usando Azure NetApp Files"]
+
+
+.Cloud Volumes ONTAP
+O suporte ao Cloud Volumes ONTAP é organizado pelo ambiente de nuvem pública. As soluções iniciais são fornecidas para dois ambientes de nuvem da seguinte forma:
+
+* link:../solutions/cvo-aws-burst-to-cloud.html["Cloud Volumes ONTAP AWS: Explosão na nuvem"]
+* link:../solutions/cvo-azure-burst-to-cloud.html["Cloud Volumes ONTAP Azure - Burst para a nuvem"]
+

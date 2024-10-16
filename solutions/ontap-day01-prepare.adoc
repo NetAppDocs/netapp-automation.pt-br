@@ -1,0 +1,207 @@
+---
+sidebar: sidebar 
+permalink: solutions/ontap-day01-prepare.html 
+keywords: bluexp automation catalog, netapp automation solutions, ontap day 0/1, prepare 
+summary: Antes de implantar a solução de automação, você precisa preparar o ambiente ONTAP e instalar e configurar o Ansible. 
+---
+= Prepare-se para usar a solução ONTAP Day 0/1
+:hardbreaks:
+:allow-uri-read: 
+:nofooter: 
+:icons: font
+:linkattrs: 
+:imagesdir: ./media/
+
+
+[role="lead"]
+Antes de implantar a solução de automação, você precisa preparar o ambiente ONTAP e instalar e configurar o Ansible.
+
+
+
+== Considerações iniciais de Planejamento
+
+Você deve analisar os requisitos e considerações a seguir antes de usar essa solução para implantar um cluster do ONTAP.
+
+.Requisitos básicos
+Para usar essa solução, você precisa atender aos seguintes requisitos básicos:
+
+* Você deve ter acesso ao software ONTAP, seja no local ou por meio de um simulador ONTAP.
+* Você deve saber como usar o software ONTAP.
+* Você precisa saber como usar as ferramentas de software de automação do Ansible.
+
+
+.Considerações de Planejamento
+Antes de implantar essa solução de automação, você deve decidir:
+
+* O local onde você executará o nó de controle do Ansible.
+* O sistema ONTAP, seja hardware no local ou um simulador ONTAP.
+* Se você vai ou não precisar de personalização.
+
+
+
+
+== Prepare o sistema ONTAP
+
+Não importa se você está usando um sistema ONTAP no local ou simule o ONTAP, prepare o ambiente antes de implantar a solução de automação.
+
+
+
+=== Opcionalmente, instale e configure o Simulate ONTAP
+
+Se você quiser implantar essa solução através de um simulador ONTAP, você deve baixar e executar o Simulate ONTAP.
+
+.Antes de começar
+* É necessário fazer o download e instalar o hypervisor VMware que você vai usar para executar o Simulate ONTAP.
++
+** Se você tiver um sistema operacional Windows ou Linux, use o VMware Workstation.
+** Se você tiver um Mac os, use o VMware Fusion.
++
+
+NOTE: Se você estiver usando um Mac os, você deve ter um processador Intel.
+
+
+
+
+
+.Passos
+Use o seguinte procedimento para instalar dois simuladores ONTAP em seu ambiente local:
+
+. Faça o download do Simulate ONTAP no link:https://mysupport.netapp.com/site/tools/tool-eula/simulate-ontap["Site de suporte da NetApp"^].
++
+
+NOTE: Embora você instale dois simuladores ONTAP, você só precisa baixar uma cópia do software.
+
+. Se ele ainda não estiver em execução, inicie seu aplicativo VMware.
+. Localize o arquivo do simulador que foi baixado e clique com o botão direito do Mouse para abri-lo com o aplicativo VMware.
+. Defina o nome da primeira instância do ONTAP.
+. Aguarde a inicialização do simulador e siga as instruções para criar um cluster de nó único.
++
+Repita as etapas para a segunda instância do ONTAP.
+
+. Opcionalmente, adicione um complemento de disco completo.
++
+Em cada cluster, execute os seguintes comandos:
+
++
+[source, cli]
+----
+security unlock -username <user_01>
+security login password -username <user_01>
+set -priv advanced
+systemshell local
+disk assign -all -node <Cluster-01>-01
+----
+
+
+
+
+=== Estado do sistema ONTAP
+
+Você deve verificar o estado inicial do sistema ONTAP, seja no local ou em execução através de um simulador ONTAP.
+
+Verifique se os seguintes requisitos do sistema ONTAP são atendidos:
+
+* O ONTAP está instalado e em execução sem cluster definido ainda.
+* O ONTAP é inicializado e exibe o endereço IP para acessar o cluster.
+* A rede é acessível.
+* Você tem credenciais de administrador.
+* O banner mensagem do dia (MOTD) é exibido com o endereço de gerenciamento.
+
+
+
+
+== Instale o software de automação necessário
+
+Esta seção fornece informações sobre como instalar o Ansible e preparar a solução de automação para implantação.
+
+
+
+=== Instalar o Ansible
+
+O Ansible pode ser instalado em sistemas Linux ou Windows.
+
+O método de comunicação padrão usado pelo Ansible para se comunicar com um cluster ONTAP é SSH.
+
+Consulte a link:https://netapp.io/2018/10/08/getting-started-with-netapp-and-ansible-install-ansible/["Primeiros passos com o NetApp e o Ansible: Instale o Ansible"^]instalação do Ansible.
+
+
+NOTE: O Ansible precisa ser instalado no nó de controle do sistema.
+
+
+
+=== Baixe e prepare a solução de automação
+
+Você pode usar as etapas a seguir para baixar e preparar a solução de automação para implantação.
+
+. Faça o download da link:https://console.bluexp.netapp.com/automationCatalog["ONTAP - dia 0/1  verificações de estado"^] solução de automação por meio da IU da Web do BlueXP . A solução é embalada `ONTAP_DAY0_DAY1.zip` como .
+. Extraia a pasta zip e copie os arquivos para o local desejado no nó de controle em seu ambiente Ansible.
+
+
+
+
+== Configuração inicial da estrutura do Ansible
+
+Execute a configuração inicial da estrutura do Ansible:
+
+. Navegue até `playbooks/inventory/group_vars/all`.
+. Desencriptar o `vault.yml` ficheiro:
++
+`ansible-vault decrypt playbooks/inventory/group_vars/all/vault.yml`
+
++
+Quando for solicitada a senha do cofre, digite a seguinte senha temporária:
+
++
+`NetApp123!`
+
++
+
+IMPORTANT: "NetApp123!" é uma senha temporária para descriptografar o `vault.yml` arquivo e a senha do cofre correspondente. Após o primeiro uso, você *deve* criptografar o arquivo usando sua própria senha.
+
+. Modifique os seguintes arquivos do Ansible:
++
+** `clusters.yml` - Modifique os valores neste arquivo para se adequar ao seu ambiente.
+** `vault.yml` - Depois de descriptografar o arquivo, modifique os valores de cluster, nome de usuário e senha do ONTAP para se adequar ao seu ambiente.
+** `cfg.yml` - Defina o caminho do arquivo `log2file` e defina `show_request` `cfg` como para `True` exibir o `raw_service_request`.
++
+A `raw_service_request` variável é exibida nos arquivos de log e durante a execução.
+
++
+
+NOTE: Cada arquivo listado contém comentários com instruções sobre como modificá-lo de acordo com suas necessidades.
+
+
+
+. Recriptografe o `vault.yml` arquivo:
++
+`ansible-vault encrypt playbooks/inventory/group_vars/all/vault.yml`
+
++
+
+NOTE: Você será solicitado a escolher uma nova senha para o cofre após a criptografia.
+
+. Navegue `playbooks/inventory/hosts` e defina um interpretador Python válido.
+. Implantar o `framework_test` serviço:
++
+O comando a seguir executa o `na_ontap_info` módulo com um `gather_subset` valor `cluster_identity_info` de . Isso valida que a configuração básica está correta e verifica se você pode se comunicar com o cluster.
+
++
+[source, cli]
+----
+ansible-playbook -i inventory/hosts site.yml -e cluster_name=<CLUSTER_NAME>
+-e logic_operation=framework-test
+----
++
+Execute o comando para cada cluster.
+
++
+Se for bem-sucedido, você verá uma saída semelhante ao seguinte exemplo:
+
++
+[listing]
+----
+PLAY RECAP *********************************************************************************
+localhost : ok=12 changed=1 unreachable=0 failed=0 skipped=6
+The key is ‘rescued=0’ and ‘failed=0’..
+----
+
