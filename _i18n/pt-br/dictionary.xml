@@ -47,18 +47,14 @@
   <block id="aabd9360d69086aa78c24d087317998e" category="doc">Astra Control</block>
   <block id="cd20c8579964fea43bbdc959d6350ba6" category="paragraph">O Astra Control é um produto de software da NetApp que fornece gerenciamento de dados com reconhecimento de aplicações de clusters do Kubernetes em vários ambientes. Os dois modelos de implantação compartilham uma API REST comum. Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a automação de suas implantações Astra usando a API REST Astra Control.</block>
   <block id="676bd50e0f10e6725dc7a68e3041cfed" category="paragraph-title">API REST do Astra Control</block>
-  <block id="bc8b1919523d4f7f0859e495e4897fca" category="paragraph">Você pode usar a API REST para automatizar a administração das implantações do Astra Control Service e do Astra Control Center.</block>
   <block id="1a0ca7f0a5aea880c24d544b4655d6ed" category="inline-link">Documentação do Astra Control Automation</block>
   <block id="faaa5531f226b4c786f8b3b21869030c" category="list-text"><block ref="faaa5531f226b4c786f8b3b21869030c" category="inline-link-rx"></block></block>
   <block id="1b92d5678e266ca01e6cce8b6ab8a786" category="paragraph-title">Família Astra</block>
   <block id="af9fe0e9b5ea86420daeb5098df7e9b9" category="paragraph">A documentação da família Astra inclui tudo o que você precisa para instalar e administrar o Astra e os softwares relacionados.</block>
   <block id="4b675e54aa1095b2b20f8c4019de37b0" category="inline-link">Documentação do Astra</block>
   <block id="4d1e53b602f4f36aaeb2beabbbe99b9e" category="list-text"><block ref="4d1e53b602f4f36aaeb2beabbbe99b9e" category="inline-link-rx"></block></block>
-  <block id="8ea149be88a341fade2aeb68d94b862c" category="summary">O NetApp BlueXP  BlueXP  é um plano de controle unificado que fornece uma plataforma multicloud híbrida para administrar serviços de storage e dados em ambientes locais e de nuvem pública. Ele é composto por vários serviços ou componentes distintos, cada um dos quais expõe uma API REST associada. Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a usar a automação do seu ambiente BlueXP .</block>
   <block id="26181faa46a5ff13906f28fd43c2474c" category="doc">Plano de controlo BlueXP </block>
-  <block id="f61db6f9b045e79f79499496d5acd04d" category="paragraph">O NetApp BlueXP  BlueXP  é um plano de controle unificado que fornece uma plataforma multicloud híbrida para administrar serviços de storage e dados em ambientes locais e de nuvem pública. Ele é composto por vários serviços ou componentes distintos, cada um dos quais expõe uma API REST associada. Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a automatizar seu ambiente BlueXP  usando as APIs REST do BlueXP .</block>
   <block id="9bd035b3034a7fcd5d8d82adcefd030c" category="paragraph-title">APIS REST do BlueXP </block>
-  <block id="eb039644918e25d625d499bf1ae3a949" category="paragraph">Use as várias APIs REST para automatizar a administração dos serviços de storage e dados gerenciados pelo BlueXP .</block>
   <block id="cfdec364233bc50bcbd67820cf4d5943" category="inline-link">Documentação da API do BlueXP</block>
   <block id="16017eedea8732d7858f0907cb028a49" category="list-text"><block ref="16017eedea8732d7858f0907cb028a49" category="inline-link-rx"></block></block>
   <block id="a8af7bb7f6fb22d8f1a96ec466769607" category="paragraph-title">Família BlueXP </block>
@@ -69,7 +65,6 @@
   <block id="203165a49e3a391bdbc44e3a05d54279" category="doc">ONTAP 9</block>
   <block id="c681e8eddcefccf18ec60d7786f0e796" category="paragraph">O NetApp ONTAP é o software de gerenciamento de dados líder do setor para implantações na nuvem e no local. O ONTAP inclui uma única API REST comum que continua a ser expandida e aprimorada com cada versão. Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a automatizar as implantações do ONTAP usando a API REST do ONTAP.</block>
   <block id="0ec641cfacd36c8e22a334135e2abdac" category="paragraph-title">API REST do ONTAP</block>
-  <block id="93f081a7384e0c442cfe6f4ebbc38992" category="paragraph">Você pode usar a API REST para automatizar a administração das implantações do ONTAP.</block>
   <block id="ec033dcf5fdadae0c2ee4fad5b7980ac" category="inline-link">Documentação de automação do ONTAP</block>
   <block id="556d06a351b4084e5ff2bf006ee89f0f" category="list-text"><block ref="556d06a351b4084e5ff2bf006ee89f0f" category="inline-link-rx"></block></block>
   <block id="19c3aa80eb958bede5080c6e3909d52e" category="paragraph-title">Família ONTAP</block>
@@ -790,4 +785,9 @@
   <block id="507a3a88cebc46603ce2be8eaa924eee" category="sidebar">Implantar</block>
   <block id="0adc03eac86772ad2c75c8f140be417e" category="sidebar">Conhecimento e apoio</block>
   <block id="4dead70589033e6b1a6f4a83af3f49df" category="list-text">Faça o download do Simulate ONTAP no <block ref="0a7ec0895e09ff6a921ca23880ce50fd" category="inline-link-macro-rx"></block>.</block>
+  <block id="c97ccc1760856d5e84a0b15270e32f34" category="paragraph">Você pode usar a API REST para automatizar a administração das suas implantações do Astra Control Service e do Astra Control Center.</block>
+  <block id="3a60d5160ebcf3bb9333d90a2f719786" category="summary">O NetApp BlueXP é um plano de controle unificado que fornece uma plataforma multi-nuvem híbrida para administrar serviços de armazenamento e dados em ambientes de nuvem pública e local.  Ele é composto de vários serviços ou componentes distintos, cada um dos quais expõe uma API REST associada.  Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a automatizar seu ambiente BlueXP .</block>
+  <block id="513a857b8d360c308601e0ffda7b2d6c" category="paragraph">O NetApp BlueXP é um plano de controle unificado que fornece uma plataforma multi-nuvem híbrida para administrar serviços de armazenamento e dados em ambientes de nuvem pública e local.  Ele é composto de vários serviços ou componentes distintos, cada um dos quais expõe uma API REST associada.  Consulte a documentação e os recursos relacionados fornecidos abaixo para começar a automatizar seu ambiente BlueXP usando as APIs REST do BlueXP .</block>
+  <block id="3ef8bda9e27327d6e6b9cd8002846fe4" category="paragraph">Você pode usar as várias APIs REST para automatizar a administração dos seus serviços de armazenamento e dados gerenciados pelo BlueXP.</block>
+  <block id="efb294b46ea40d11332e139b2e6bf3f8" category="paragraph">Você pode usar a API REST para automatizar a administração de suas implantações ONTAP .</block>
 </blocks>
