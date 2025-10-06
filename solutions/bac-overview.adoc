@@ -2,9 +2,9 @@
 sidebar: sidebar 
 permalink: solutions/bac-overview.html 
 keywords: bluexp automation catalog, automation catalog, overview, introduction 
-summary: O catálogo de automação da BlueXP  é um conjunto de soluções de automação disponíveis para clientes, parceiros e funcionários da NetApp. O catálogo tem vários recursos e benefícios. 
+summary: O catálogo de automação do NetApp Console é uma coleção de soluções de automação disponíveis para clientes, parceiros e funcionários da NetApp .  O catálogo tem vários recursos e benefícios. 
 ---
-= Visão geral do catálogo de automação da BlueXP 
+= Visão geral do catálogo de automação do NetApp Console
 :hardbreaks:
 :allow-uri-read: 
 :nofooter: 
@@ -14,11 +14,11 @@ summary: O catálogo de automação da BlueXP  é um conjunto de soluções de 
 
 
 [role="lead"]
-O catálogo de automação da BlueXP  é um conjunto de soluções de automação disponíveis para clientes, parceiros e funcionários da NetApp. O catálogo tem vários recursos e benefícios.
+O catálogo de automação do NetApp Console é uma coleção de soluções de automação disponíveis para clientes, parceiros e funcionários da NetApp .  O catálogo tem vários recursos e benefícios.
 
-Um único local para suas necessidades de automação:: Pode aceder ao https://console.bluexp.netapp.com/automationCatalog["Catálogo de automação da BlueXP"^] através da interface de utilizador da Web do BlueXP . Isso fornece um único local para os scripts, playbooks e módulos necessários para aprimorar a automação e a operação de seus produtos e serviços NetApp.
+Um único local para suas necessidades de automação:: Você pode acessar o https://console.netapp.com/automationCatalog["Catálogo de automação do NetApp Console"^] por meio da interface do usuário da web do Console.  Isso fornece um local único para os scripts, manuais e módulos necessários para aprimorar a automação e a operação dos seus produtos e serviços NetApp .
 As soluções são criadas e testadas pela NetApp:: Todas as soluções de automação e scripts foram criados e testados pela NetApp. Cada solução destina-se a um caso de uso ou solicitação específico do cliente. A maior parte do foco é a integração com os serviços de dados e arquivos do NetApp.
-Documentação:: Cada uma das soluções de automação inclui documentação associada para ajudá-lo a começar. Embora as soluções sejam acessadas através da interface web do BlueXP , toda a documentação está disponível neste site. A documentação é organizada com base nos produtos e serviços de nuvem da NetApp.
-Base sólida para o futuro:: A NetApp tem o compromisso de ajudar nossos clientes a aprimorar e otimizar a automação de seus data centers e ambientes de nuvem. Esperamos continuar aprimorando o catálogo de automação da BlueXP  para atender aos requisitos dos clientes, às mudanças de tecnologia e à integração contínua de produtos.
+Documentação:: Cada uma das soluções de automação inclui documentação associada para ajudar você a começar.  Embora as soluções sejam acessadas pela interface web do Console, toda a documentação está disponível neste site.  A documentação é organizada com base nos produtos e serviços de nuvem da NetApp .
+Base sólida para o futuro:: A NetApp está comprometida em ajudar nossos clientes a melhorar e otimizar a automação de seus data centers e ambientes de nuvem.  Esperamos continuar aprimorando o catálogo de automação do Console para atender aos requisitos do cliente, mudanças tecnológicas e integração contínua de produtos.
 Queremos ouvir de você:: A equipe de automação do escritório de experiência do Cliente (CXO) da NetApp gostaria de ouvir de você. Se você tiver algum feedback, problemas ou solicitações de recursos, envie um e-mail para NetApp.com[equipe de automação CXO].
 
