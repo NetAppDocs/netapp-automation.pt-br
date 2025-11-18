@@ -1,8 +1,8 @@
 ---
 sidebar: sidebar 
 permalink: solutions/cvo-aws-burst-to-cloud.html 
-keywords: bluexp automation catalog, netapp automation solutions, aws, cloud volumes ontap, burst to cloud 
-summary: Este artigo oferece suporte à solução de automação NetApp Cloud Volumes ONTAP para AWS, que está disponível para clientes da NetApp no ​​catálogo de automação do NetApp Console. 
+keywords: bluexp automation hub, netapp automation solutions, aws, cloud volumes ontap, burst to cloud 
+summary: Este artigo oferece suporte à solução NetApp Cloud Volumes ONTAP para AWS Automation, disponível para clientes NetApp no ​​hub NetApp Console Automation. 
 ---
 = Cloud Volumes ONTAP para AWS: Explosão na nuvem
 :hardbreaks:
@@ -14,12 +14,12 @@ summary: Este artigo oferece suporte à solução de automação NetApp Cloud Vo
 
 
 [role="lead"]
-Este artigo oferece suporte à solução de automação NetApp Cloud Volumes ONTAP para AWS, que está disponível para clientes da NetApp no ​​catálogo de automação do NetApp Console.
+Este artigo oferece suporte à solução de automação NetApp Cloud Volumes ONTAP para AWS, disponível para clientes NetApp no ​​hub de automação do NetApp Console .
 
 A solução de automação Cloud Volumes ONTAP para AWS automatiza a implantação em contêiner do Cloud Volumes ONTAP para AWS usando o Terraform, permitindo que você implante o Cloud Volumes ONTAP para AWS rapidamente, sem qualquer intervenção manual.
 
 .Antes de começar
-* Você deve baixar olink:https://console.netapp.com/automationCatalog["Cloud Volumes ONTAP AWS: Explosão na nuvem"^] solução de automação por meio da interface web do Console.  A solução é embalada como `cvo_aws_flexcache.zip` .
+* Você precisa baixar o link:https://console.netapp.com/automationHub["Cloud Volumes ONTAP AWS: Explosão na nuvem"^] Solução de automação através da interface web do Console. A solução é empacotada como `cvo_aws_flexcache.zip`.
 * Você deve instalar uma VM Linux na mesma rede que o Cloud Volumes ONTAP.
 * Depois de instalar a VM Linux, você deve seguir as etapas desta solução para instalar as dependências necessárias.
 

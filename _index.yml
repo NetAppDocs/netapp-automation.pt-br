@@ -13,7 +13,7 @@ indexpage:
     links:
     - title: O que há de novo
       url: "/about/whats-new.html"
-    - title: Catálogo de automação do NetApp Console
+    - title: Hub de automação do NetApp Console
       url: "/solutions/bac-overview.html"
     - title: Recursos adicionais
       url: "/support/additional-resources.html"

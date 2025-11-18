@@ -30,7 +30,7 @@ O suporte ao Cloud Volumes ONTAP é organizado pelo ambiente de nuvem pública. 
 
 == 04 de junho de 2023
 
-O https://console.netapp.com/automationCatalog["Catálogo de automação do NetApp Console"^] está disponível por meio da interface de usuário da web do Console.  O catálogo de automação fornece acesso a soluções que podem ajudar você com a implantação e integração automatizadas de produtos NetApp .  A documentação dessas soluções é organizada em diversas áreas funcionais ou de produtos, conforme descrito abaixo.
+O https://console.netapp.com/automationHub["Hub de automação do NetApp Console"^] Está disponível através da interface web do Console. O hub de automação fornece acesso a soluções que podem ajudar na implantação e integração automatizadas de produtos NetApp . A documentação dessas soluções está organizada em diversas áreas de produto ou funcionais, conforme descrito abaixo.
 
 .Amazon FSx for NetApp ONTAP
 Duas soluções de gerenciamento do Amazon FSx for NetApp ONTAP são fornecidas da seguinte forma:

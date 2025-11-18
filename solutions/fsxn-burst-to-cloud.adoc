@@ -1,7 +1,7 @@
 ---
 sidebar: sidebar 
 permalink: solutions/fsxn-burst-to-cloud.html 
-keywords: bluexp automation catalog, netapp automation solutions, fsx for ontap, burst to cloud, netapp console 
+keywords: bluexp automation hub, netapp automation solutions, fsx for ontap, burst to cloud, netapp console 
 summary: Você pode usar esta solução de automação para provisionar o Amazon FSx for NetApp ONTAP com volumes e um FlexCache associado. 
 ---
 = Amazon FSx for NetApp ONTAP - Explosão para a nuvem
@@ -35,7 +35,7 @@ A automação é baseada no Docker e no Docker Compose, que deve ser instalado n
 .Antes de começar
 Para concluir o provisionamento e a configuração, você precisa ter o seguinte:
 
-* Você precisa baixar o https://console.netapp.com/automationCatalog["Amazon FSx for NetApp ONTAP - Explosão para a nuvem"^] solução de automação por meio da interface de usuário da Web do NetApp Console.  A solução é empacotada como arquivo `AWS_FSxN_BTC.zip` .
+* Você precisa baixar o https://console.netapp.com/automationHub["Amazon FSx for NetApp ONTAP - Explosão para a nuvem"^] Solução de automação através da interface web do NetApp Console . A solução está empacotada como um arquivo. `AWS_FSxN_BTC.zip`.
 * Conetividade de rede entre os sistemas de origem e destino.
 * Uma VM Linux com as seguintes caraterísticas:
 +

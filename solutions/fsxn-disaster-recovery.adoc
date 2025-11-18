@@ -1,7 +1,7 @@
 ---
 sidebar: sidebar 
 permalink: solutions/fsxn-disaster-recovery.html 
-keywords: bluexp automation catalog, netapp automation solutions, fsx for ontap, disaster recovery, backup, netapp console 
+keywords: bluexp automation hub, netapp automation solutions, fsx for ontap, disaster recovery, backup, netapp console 
 summary: Você pode usar essa solução de automação para fazer um backup de recuperação de desastres de um sistema de origem usando o Amazon FSX for NetApp ONTAP. 
 ---
 = Gerenciamento do Amazon FSx for NetApp ONTAP - Recuperação de desastres
@@ -36,7 +36,7 @@ A automação é baseada no Docker e no Docker Compose, que deve ser instalado n
 .Antes de começar
 Para concluir o provisionamento e a configuração, você precisa ter o seguinte:
 
-* Você precisa baixar o https://console.netapp.com/automationCatalog["Gerenciamento do Amazon FSx for NetApp ONTAP - Recuperação de desastres"^] solução de automação por meio da interface de usuário da Web do NetApp Console.  A solução é embalada como `FSxN_DR.zip` .  Este zip contém o `AWS_FSxN_Bck_Prov.zip` arquivo que você usará para implantar a solução descrita neste documento.
+* Você precisa baixar o https://console.netapp.com/automationHub["Gerenciamento do Amazon FSx for NetApp ONTAP - Recuperação de desastres"^] Solução de automação através da interface web do NetApp Console . A solução é empacotada como `FSxN_DR.zip`. Este arquivo zip contém o `AWS_FSxN_Bck_Prov.zip` Arquivo que você usará para implantar a solução descrita neste documento.
 * Conetividade de rede entre os sistemas de origem e destino.
 * Uma VM Linux com as seguintes caraterísticas:
 +
